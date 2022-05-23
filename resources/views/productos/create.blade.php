@@ -1,7 +1,7 @@
 @extends('layouts.principal')
 
 @section('contenido')
-    <form class="col s8">
+    <form class="col s8" method="POST" action ="{{route ('productos.store') }}">@csrf
         <div class="row">
             <div class="col s8">
                 <h1 class="pink-text text-darken-4">Nuevo Producto</h1>
@@ -13,7 +13,8 @@
             placeholder="Nombre de Producto" 
             id="nombre" 
             type="text" 
-            class="validate">
+            class="validate"
+            name= "nombre">
           <label for="nombre">
               Nombre del producto
           </label>
@@ -24,8 +25,9 @@
           <input
           id="desc" 
           type="text" 
-          class="validate">
-          <label for="decripcion">Descripción</label>
+          class="validate"
+          name= "desc">
+          <label for="desc">Descripción</label>
         </div>
       </div>
       <div class="row">
@@ -33,7 +35,8 @@
           <input 
           id="precio" 
           type="number" 
-          class="validate">
+          class="validate"
+          name= "precio">
           <label for="precio">Precio</label>
         </div>
       </div>
@@ -44,9 +47,20 @@
                     Elija su marca
                 </option>
                 @foreach($marcas as $marca)
-                <option>{{ $marca->nombre }}</option>
+                <option value="{{ $marca->id }}" >{{ $marca->nombre }}</option>
                 @endforeach
             </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s8 input-field">
+          <select name="categoria" id="categoria">
+            @foreach($categorias as $categoria)
+             <option value="{{ $categoria->id }}">
+               {{ $categoria->nombre }}
+             </option>
+            @endforeach
+          </select>
         </div>
       </div>
       <div class="row">
@@ -63,9 +77,8 @@
         </div>
       </div>
       <div class="row">
-        <div class="col s8">
-          <a class="waves-effect waves-light btn"><i class="material-icons right">Guardar</i></a>
-        </div>
+         <button class="btn waves-effect waves-light" type="submit">Guardar
+         </button>
       </div>
     </form>
 
