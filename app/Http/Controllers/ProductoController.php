@@ -6,6 +6,7 @@ use App\Models\Producto;
 use App\Models\Categoria;
 use App\Models\Marca;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProductoController extends Controller
 {
@@ -42,17 +43,47 @@ class ProductoController extends Controller
      */
     public function store(Request $r)
     {
-        //crear un nuevo producto
-        $p = new Producto();
-        //asignar atributos del producto 
-        $p-> nombre = $r->nombre;
-        $p-> desc = $r->desc;
-        $p-> precio = $r->precio;
-        $p-> marca_id = $r->marca;
-        $p-> categoria_id = $r->categoria;
-        //grabar producto 
-        $p-> save();
-        echo "producto guardado ";
+
+        $reglas=[
+            "nombre" => 'required|alpha|unique:productos,nombre',
+            "desc" => 'required|min:5|max:20',
+            "precio" => 'required|numeric',
+            "imagen" => 'required|image',
+            "marca" => 'required',
+            "categoria" => 'required'
+        ];
+
+        $v = Validator::make($r->all() , $reglas );
+
+        if($v->fails()){
+                //si la validacion fallo
+                //redirigirme hacia la vista d ecreate (ruta: productos/create)
+                //con los mensajes de error
+                return redirect('productos/create')
+                        ->withErrors($v);
+        }else{
+                //validacion exitosa
+                $archivo=$r->imagen;
+                $nombre_archivo = $archivo->getClientOriginalName();
+                $ruta = public_path()."/img";
+                $archivo->move($ruta , $nombre_archivo );
+        
+                //crear un nuevo producto
+                $p = new Producto();
+                //asignar atributos del producto 
+                $p-> nombre = $r->nombre;
+                $p-> desc = $r->desc;
+                $p-> precio = $r->precio;
+                $p-> marca_id = $r->marca;
+                $p-> categoria_id = $r->categoria;
+                $p->imagen = $nombre_archivo;
+                //grabar producto 
+                $p-> save();
+                //redirigir a productos/create
+                return redirect('productos/create')
+                        ->with('mensajito' , 'pproducto registrado exitosamente');
+        }
+        
     }
 
     /**
